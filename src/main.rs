@@ -1,48 +1,47 @@
-use std::{
-    cell::RefCell,
-    rc::{Rc, Weak},
-};
+use std::rc::Rc;
 
-use lib::Node;
+use lib::AppleTree;
 
 fn main() {
-    let leaf = Rc::new(Node::<String> {
-        value: "Sieben".into(),
-        parent: RefCell::new(Weak::new()),
-        children: RefCell::new(vec![]),
-    });
+    let tree: AppleTree<String> = AppleTree::default();
 
-    println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
-    println!("Start of scope {}", "=".repeat(20));
+    let leaf = tree.node("leaf".into());
+    let leaf2 = tree.node("leaf2".into());
 
-    {
-        let branch = Rc::new(Node::<String> {
-            value: "Funf".into(),
-            parent: RefCell::new(Weak::new()),
-            children: RefCell::new(vec![Rc::clone(&leaf)]),
-        });
+    tree.change_node_parent(Rc::clone(&leaf2), Rc::clone(&leaf));
+    println!("tree {:?}\n\n", tree);
+    println!("leaf {:?}\n\n", leaf);
+    println!("leaf2 {:?}\n\n", leaf2);
 
-        *leaf.parent.borrow_mut() = Rc::downgrade(&branch);
+    // println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+    // println!("{} Scope-start", "=".repeat(20));
 
-        println!(
-            "branch strong = {}, weak = {}",
-            Rc::strong_count(&branch),
-            Rc::weak_count(&branch),
-        );
+    // {
+    //     let branch = Rc::new(Node::new("Branch".into()));
 
-        println!(
-            "leaf strong = {}, weak = {}",
-            Rc::strong_count(&leaf),
-            Rc::weak_count(&leaf),
-        );
-    }
+    //     branch.children.borrow_mut().push(Rc::clone(&leaf));
 
-    println!("End of scope {}", "=".repeat(20));
-    println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+    //     *leaf.parent.borrow_mut() = Rc::downgrade(&branch);
 
-    println!(
-        "leaf strong = {}, weak = {}",
-        Rc::strong_count(&leaf),
-        Rc::weak_count(&leaf)
-    );
+    //     println!(
+    //         "branch strong = {}, weak = {}",
+    //         Rc::strong_count(&branch),
+    //         Rc::weak_count(&branch),
+    //     );
+
+    //     println!(
+    //         "leaf strong = {}, weak = {}",
+    //         Rc::strong_count(&leaf),
+    //         Rc::weak_count(&leaf),
+    //     );
+    // }
+
+    // println!("{} Scope-end", "=".repeat(20));
+    // println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+
+    // println!(
+    //     "leaf strong = {}, weak = {}",
+    //     Rc::strong_count(&leaf),
+    //     Rc::weak_count(&leaf)
+    // );
 }
